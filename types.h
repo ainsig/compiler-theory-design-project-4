@@ -6,13 +6,16 @@
 // This file contains type definitions and the function
 // prototypes for the type checking functions
 
+
 typedef char* CharPtr;
 
-enum Types {MISMATCH, INT_TYPE, CHAR_TYPE, REAL_TYPE, HEX_TYPE, NONE};
+enum Types {MISMATCH, INT_TYPE, CHAR_TYPE, REAL_TYPE, HEX_TYPE, LIST_TYPE, NONE};
 
 void checkAssignment(Types lValue, Types rValue, string message);
 Types checkWhen(Types true_, Types false_);
 Types checkSwitch(Types case_, Types when, Types other);
 Types checkCases(Types left, Types right);
 Types checkArithmetic(Types left, Types right);
+Types checkListElements(vector<Types>& elements, Types listType);
+
 

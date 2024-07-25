@@ -18,10 +18,12 @@ using namespace std;
 
 int yylex();
 Types find(Symbols<Types>& table, CharPtr identifier, string tableName);
+Types findList(Symbols<Types>& table, CharPtr identifier);
 void yyerror(const char* message);
 
 Symbols<Types> scalars;
 Symbols<Types> lists;
+vector<Types> listElements;
 
 %}
 
@@ -34,7 +36,7 @@ Symbols<Types> lists;
 
 %token <iden> IDENTIFIER
 
-%token <type> INT_LITERAL CHAR_LITERAL REAL_LITERAL HEX_LITERAL
+%token <type> INT_LITERAL CHAR_LITERAL REAL_LITERAL HEX_LITERAL 
 
 %token ADDOP MULOP RELOP ANDOP ARROW
 
@@ -56,9 +58,10 @@ function_header:
 	error ';';
 
 type:
-	INTEGER {$$ = INT_TYPE;} |
-	REAL {$$ = REAL_TYPE;} |
-	CHARACTER {$$ = CHAR_TYPE; };
+    	INTEGER { $$ = INT_TYPE; } |
+    	REAL { $$ = REAL_TYPE; } |
+    	CHARACTER { $$ = CHAR_TYPE; } |
+    	LIST  { $$ = LIST_TYPE; } ;
 	
 optional_variable:
 	variable_list | variable |
@@ -68,13 +71,22 @@ variable_list:
 	variable |
 	variable_list variable ;
     
-variable:	
-	IDENTIFIER ':' type IS statement ';' {checkAssignment($3, $5, "Variable Initialization"); scalars.insert($1, $3);} |
-	IDENTIFIER ':' LIST OF type IS list ';' {lists.insert($1, $5);} |
-	error ';';
+variable:    
+    	IDENTIFIER ':' type OF type IS list ';' {
+        	Types listType = checkListElements(listElements, $3);
+        	listElements.clear();
+        	if (listType != MISMATCH) {
+            		lists.insert($1, listType);
+        	}
+    	} |
+    	IDENTIFIER ':' type IS expression ';' 
+    	{ checkAssignment($3, $5, "Variable Initialization"); scalars.insert($1, $3); } |
+    	error ';';
+
 
 list:
-	'(' expressions ')' {$$ = $2;} ;
+    	'(' expressions ')' { $$ = $2; } ;
+
 
 parameters: 
 	parameter_list |
@@ -88,8 +100,9 @@ parameter:
 	IDENTIFIER ':' type ;
 
 expressions:
-	expressions ',' expression | 
-	expression ;
+    	expressions ',' expression { listElements.push_back($3); $$ = $3; } | 
+    	expression { listElements.push_back($1); $$ = $1; } ;
+
 
 body:
 	BEGIN_ statement_ END ';' {$$ = $2;} ;
@@ -153,13 +166,12 @@ term:
 
 primary:
     	'(' expression ')' { $$ = $2; } |
-    	expression arithmetic_operator expression |
-    	NEGOP expression |
+    	NEGOP expression { $$ = $2; } |
     	INT_LITERAL { $$ = INT_TYPE; } |
     	HEX_LITERAL { $$ = INT_TYPE; } |
     	CHAR_LITERAL { $$ = CHAR_TYPE; } |
     	REAL_LITERAL { $$ = REAL_TYPE; } |
-    	IDENTIFIER '(' expression ')' { $$ = find(lists, $1, "List"); } |
+    	IDENTIFIER '(' expression ')' { $$ = findList(lists, $1); } |
     	IDENTIFIER { $$ = find(scalars, $1, "Scalar"); } ;
 
 arithmetic_operator: REMOP | EXOP
@@ -173,6 +185,15 @@ Types find(Symbols<Types>& table, CharPtr identifier, string tableName) {
 		return MISMATCH;
 	}
 	return type;
+}
+
+Types findList(Symbols<Types>& table, CharPtr identifier) {
+    Types type;
+    if (!table.find(identifier, type)) {
+        appendError(UNDECLARED, "List " + string(identifier));
+        return MISMATCH;
+    }
+    return type;
 }
 
 void yyerror(const char* message) {

@@ -64,18 +64,13 @@ Types checkArithmetic(Types left, Types right) {
     return MISMATCH;
 }
 
-Types checkListElements(vector<Types>& elements) {
-    if (elements.empty()) {
-        appendError(GENERAL_SEMANTIC, "List is empty");
-        return MISMATCH;
-    }
-
-    Types firstType = elements[0];
+Types checkListElements(vector<Types>& elements, Types listType) {
     for (Types type : elements) {
-        if (type != firstType) {
-            appendError(GENERAL_SEMANTIC, "List Elements Type Mismatch");
+        if (type != listType) {
+            appendError(GENERAL_SEMANTIC, "List Element Types Do Not Match");
             return MISMATCH;
         }
     }
-    return firstType;
+    return listType;
 }
+
