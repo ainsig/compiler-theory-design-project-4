@@ -34,12 +34,13 @@ Symbols<Types> lists;
 
 %token <iden> IDENTIFIER
 
-%token <type> INT_LITERAL CHAR_LITERAL
+%token <type> INT_LITERAL CHAR_LITERAL REAL_LITERAL HEX_LITERAL
 
 %token ADDOP MULOP RELOP ANDOP ARROW
 
 %token BEGIN_ CASE CHARACTER ELSE END ENDSWITCH FUNCTION INTEGER IS LIST OF OTHERS
-	RETURNS SWITCH WHEN
+	RETURNS SWITCH WHEN REMOP EXOP NEGOP OROP NOTOP ELSIF ENDFOLD ENDIF FOLD IF 
+	LEFT REAL RIGHT THEN 
 
 %type <type> list expressions body type statement_ statement cases case expression
 	term primary
@@ -51,22 +52,40 @@ function:
 	
 		
 function_header:	
-	FUNCTION IDENTIFIER RETURNS type ';' ;
+	FUNCTION IDENTIFIER parameters RETURNS type ';' |
+	error ';';
 
 type:
 	INTEGER {$$ = INT_TYPE;} |
+	REAL {$$ = REAL_TYPE;} |
 	CHARACTER {$$ = CHAR_TYPE; };
 	
 optional_variable:
-	variable |
+	variable_list | variable |
 	%empty ;
+
+variable_list: 
+	variable |
+	variable_list variable ;
     
 variable:	
 	IDENTIFIER ':' type IS statement ';' {checkAssignment($3, $5, "Variable Initialization"); scalars.insert($1, $3);} |
-	IDENTIFIER ':' LIST OF type IS list ';' {lists.insert($1, $5);} ;
+	IDENTIFIER ':' LIST OF type IS list ';' {lists.insert($1, $5);} |
+	error ';';
 
 list:
 	'(' expressions ')' {$$ = $2;} ;
+
+parameters: 
+	parameter_list |
+	%empty ;
+
+parameter_list:
+	parameter |
+	parameter_list ',' parameter ;
+
+parameter: 
+	IDENTIFIER ':' type ;
 
 expressions:
 	expressions ',' expression | 
@@ -81,25 +100,48 @@ statement_:
 	
 statement:
 	expression |
-	WHEN condition ',' expression ':' expression 
-		{$$ = checkWhen($4, $6);} |
-	SWITCH expression IS cases OTHERS ARROW statement ';' ENDSWITCH 
-		{$$ = checkSwitch($2, $4, $7);} ;
+	WHEN condition ',' expression ':' expression {$$ = checkWhen($4, $6);} |
+	SWITCH expression IS cases OTHERS ARROW statement ';' 
+	ENDSWITCH {$$ = checkSwitch($2, $4, $7);} | 
+	IF condition THEN statement_ elsif_statements ELSE statement_ ENDIF |
+	FOLD direction operator list_choice ENDFOLD ;
+	
+elsif_statements: 
+	elsif_statement elsif_statements |
+	%empty ; 
+	
+elsif_statement: 
+	ELSIF condition THEN statement_ ; 
+
+direction: 
+	LEFT | RIGHT ; 
+
+operator:
+	ADDOP | MULOP ; 
+
+list_choice:
+	list | IDENTIFIER ; 
 
 cases:
 	cases case {$$ = checkCases($1, $2);} |
 	%empty {$$ = NONE;} ;
 	
 case:
-	CASE INT_LITERAL ARROW statement ';' {$$ = $4;} ; 
+	CASE INT_LITERAL ARROW statement ';' {$$ = $4;} |
+	error ';' ; 
 
 condition:
 	condition ANDOP relation |
 	relation ;
 
 relation:
-	'(' condition')' |
-	expression RELOP expression ;
+	expression RELOP expression |
+	condition logical_operator condition |
+	'(' condition ')' |
+	NOTOP condition ;
+
+logical_operator: 
+	OROP | NOTOP ; 
 	
 expression:
 	expression ADDOP term {$$ = checkArithmetic($1, $3);} |
@@ -111,10 +153,16 @@ term:
 
 primary:
 	'(' expression ')' {$$ = $2;} |
-	INT_LITERAL | 
+	expression arithmetic_operator expression |
+	NEGOP expression |
+	INT_LITERAL |
+	HEX_LITERAL |
 	CHAR_LITERAL |
+	REAL_LITERAL |
 	IDENTIFIER '(' expression ')' {$$ = find(lists, $1, "List");} |
 	IDENTIFIER  {$$ = find(scalars, $1, "Scalar");} ;
+
+arithmetic_operator: REMOP | EXOP
 
 %%
 
