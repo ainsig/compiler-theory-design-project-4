@@ -14,10 +14,20 @@ using namespace std;
 #include "listing.h"
 
 void checkAssignment(Types lValue, Types rValue, string message) {
-	if (lValue != MISMATCH && rValue != MISMATCH && lValue != rValue)
-		appendError(GENERAL_SEMANTIC, "Type Mismatch on " + message);
-}
+    // Handle specific type checks for literals
+    if ((lValue == INT_TYPE && rValue == INT_TYPE) ||
+        (lValue == REAL_TYPE && rValue == REAL_TYPE) ||
+        (lValue == CHAR_TYPE && rValue == CHAR_TYPE) ||
+        (lValue == INT_TYPE && rValue == HEX_TYPE)) {
+        // Types are compatible, no action needed
+        return;
+    }
 
+    // General type mismatch check
+    if (lValue != MISMATCH && rValue != MISMATCH && lValue != rValue) {
+        appendError(GENERAL_SEMANTIC, "Type Mismatch on " + message);
+    }
+}
 Types checkWhen(Types true_, Types false_) {
 	if (true_ == MISMATCH || false_ == MISMATCH)
 		return MISMATCH;
@@ -42,12 +52,30 @@ Types checkCases(Types left, Types right) {
 }
 
 Types checkArithmetic(Types left, Types right) {
-	if (left == MISMATCH || right == MISMATCH)
-		return MISMATCH;
-	if (left == INT_TYPE && right == INT_TYPE)
-		return INT_TYPE;
-	if (left == REAL_TYPE && right == REAL_TYPE)
-		return REAL_TYPE;
-	appendError(GENERAL_SEMANTIC, "Integer Type Required");
-	return MISMATCH;
+    if (left == MISMATCH || right == MISMATCH)
+        return MISMATCH;
+    if (left == INT_TYPE && right == INT_TYPE)
+        return INT_TYPE;
+    if (left == REAL_TYPE && right == REAL_TYPE)
+        return REAL_TYPE;
+    if ((left == INT_TYPE && right == REAL_TYPE) || (left == REAL_TYPE && right == INT_TYPE))
+        return REAL_TYPE;
+    appendError(GENERAL_SEMANTIC, "Integer or Real Type Required");
+    return MISMATCH;
+}
+
+Types checkListElements(vector<Types>& elements) {
+    if (elements.empty()) {
+        appendError(GENERAL_SEMANTIC, "List is empty");
+        return MISMATCH;
+    }
+
+    Types firstType = elements[0];
+    for (Types type : elements) {
+        if (type != firstType) {
+            appendError(GENERAL_SEMANTIC, "List Elements Type Mismatch");
+            return MISMATCH;
+        }
+    }
+    return firstType;
 }

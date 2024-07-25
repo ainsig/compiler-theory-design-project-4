@@ -1598,36 +1598,66 @@ yyreduce:
 
   case 53: /* expression: expression ADDOP term  */
 #line 147 "parser.y"
-                              {(yyval.type) = checkArithmetic((yyvsp[-2].type), (yyvsp[0].type));}
+                              { (yyval.type) = checkArithmetic((yyvsp[-2].type), (yyvsp[0].type)); }
 #line 1603 "parser.tab.c"
+    break;
+
+  case 54: /* expression: term  */
+#line 148 "parser.y"
+             { (yyval.type) = (yyvsp[0].type); }
+#line 1609 "parser.tab.c"
     break;
 
   case 55: /* term: term MULOP primary  */
 #line 151 "parser.y"
                            {(yyval.type) = checkArithmetic((yyvsp[-2].type), (yyvsp[0].type));}
-#line 1609 "parser.tab.c"
+#line 1615 "parser.tab.c"
     break;
 
   case 57: /* primary: '(' expression ')'  */
 #line 155 "parser.y"
-                           {(yyval.type) = (yyvsp[-1].type);}
-#line 1615 "parser.tab.c"
+                           { (yyval.type) = (yyvsp[-1].type); }
+#line 1621 "parser.tab.c"
+    break;
+
+  case 60: /* primary: INT_LITERAL  */
+#line 158 "parser.y"
+                    { (yyval.type) = INT_TYPE; }
+#line 1627 "parser.tab.c"
+    break;
+
+  case 61: /* primary: HEX_LITERAL  */
+#line 159 "parser.y"
+                    { (yyval.type) = INT_TYPE; }
+#line 1633 "parser.tab.c"
+    break;
+
+  case 62: /* primary: CHAR_LITERAL  */
+#line 160 "parser.y"
+                     { (yyval.type) = CHAR_TYPE; }
+#line 1639 "parser.tab.c"
+    break;
+
+  case 63: /* primary: REAL_LITERAL  */
+#line 161 "parser.y"
+                     { (yyval.type) = REAL_TYPE; }
+#line 1645 "parser.tab.c"
     break;
 
   case 64: /* primary: IDENTIFIER '(' expression ')'  */
 #line 162 "parser.y"
-                                      {(yyval.type) = find(lists, (yyvsp[-3].iden), "List");}
-#line 1621 "parser.tab.c"
+                                      { (yyval.type) = find(lists, (yyvsp[-3].iden), "List"); }
+#line 1651 "parser.tab.c"
     break;
 
   case 65: /* primary: IDENTIFIER  */
 #line 163 "parser.y"
-                    {(yyval.type) = find(scalars, (yyvsp[0].iden), "Scalar");}
-#line 1627 "parser.tab.c"
+                   { (yyval.type) = find(scalars, (yyvsp[0].iden), "Scalar"); }
+#line 1657 "parser.tab.c"
     break;
 
 
-#line 1631 "parser.tab.c"
+#line 1661 "parser.tab.c"
 
       default: break;
     }

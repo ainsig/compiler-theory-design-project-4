@@ -144,23 +144,23 @@ logical_operator:
 	OROP | NOTOP ; 
 	
 expression:
-	expression ADDOP term {$$ = checkArithmetic($1, $3);} |
-	term ;
-      
+    	expression ADDOP term { $$ = checkArithmetic($1, $3); } |
+    	term { $$ = $1; };
+    	
 term:
 	term MULOP primary {$$ = checkArithmetic($1, $3);} |
 	primary ;
 
 primary:
-	'(' expression ')' {$$ = $2;} |
-	expression arithmetic_operator expression |
-	NEGOP expression |
-	INT_LITERAL |
-	HEX_LITERAL |
-	CHAR_LITERAL |
-	REAL_LITERAL |
-	IDENTIFIER '(' expression ')' {$$ = find(lists, $1, "List");} |
-	IDENTIFIER  {$$ = find(scalars, $1, "Scalar");} ;
+    	'(' expression ')' { $$ = $2; } |
+    	expression arithmetic_operator expression |
+    	NEGOP expression |
+    	INT_LITERAL { $$ = INT_TYPE; } |
+    	HEX_LITERAL { $$ = INT_TYPE; } |
+    	CHAR_LITERAL { $$ = CHAR_TYPE; } |
+    	REAL_LITERAL { $$ = REAL_TYPE; } |
+    	IDENTIFIER '(' expression ')' { $$ = find(lists, $1, "List"); } |
+    	IDENTIFIER { $$ = find(scalars, $1, "Scalar"); } ;
 
 arithmetic_operator: REMOP | EXOP
 
