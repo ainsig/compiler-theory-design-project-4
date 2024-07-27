@@ -20,6 +20,7 @@ int yylex();
 Types find(Symbols<Types>& table, CharPtr identifier, string tableName);
 Types findList(Symbols<Types>& table, CharPtr identifier);
 void yyerror(const char* message);
+void checkListTypeConsistency(Types declaredType, Types elementType);
 
 Symbols<Types> scalars;
 Symbols<Types> lists;
@@ -74,12 +75,9 @@ variable_list:
 variable:    
     	IDENTIFIER ':' type IS list ';' {
         	Types listType = checkListElements(listElements, $3);
-        	lists.insert($1, $3); 
         	//listElements.clear(); 
-        	//checkListTypeConsistency($4, elementType); // Ensure types match
-        	if (listType != MISMATCH) {
-            		lists.insert($1, listType);
-        	}
+        	//checkListTypeConsistency($3, listType); // Ensure types matc
+        	lists.insert($1, $3); 
     	} |
     	IDENTIFIER ':' type IS expression ';' 
     	{ checkAssignment($3, $5, "Variable Initialization"); scalars.insert($1, $3); } |
