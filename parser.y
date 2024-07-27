@@ -61,7 +61,7 @@ type:
     	INTEGER { $$ = INT_TYPE; } |
     	REAL { $$ = REAL_TYPE; } |
     	CHARACTER { $$ = CHAR_TYPE; } |
-    	LIST  { $$ = LIST_TYPE; } ;
+    	LIST OF type { $$ = LIST_TYPE; } ;
 	
 optional_variable:
 	variable_list | variable |
@@ -72,9 +72,11 @@ variable_list:
 	variable_list variable ;
     
 variable:    
-    	IDENTIFIER ':' type OF type IS list ';' {
+    	IDENTIFIER ':' type IS list ';' {
         	Types listType = checkListElements(listElements, $3);
-        	listElements.clear();
+        	lists.insert($1, $3); 
+        	//listElements.clear(); 
+        	//checkListTypeConsistency($4, elementType); // Ensure types match
         	if (listType != MISMATCH) {
             		lists.insert($1, listType);
         	}
@@ -168,10 +170,18 @@ primary:
     	'(' expression ')' { $$ = $2; } |
     	NEGOP expression { $$ = $2; } |
     	INT_LITERAL { $$ = INT_TYPE; } |
-    	HEX_LITERAL { $$ = INT_TYPE; } |
+    	HEX_LITERAL { $$ = HEX_TYPE; } |
     	CHAR_LITERAL { $$ = CHAR_TYPE; } |
     	REAL_LITERAL { $$ = REAL_TYPE; } |
-    	IDENTIFIER '(' expression ')' { $$ = findList(lists, $1); } |
+    	//IDENTIFIER '(' expression ')' { $$ = findList(lists, $1); } |
+    	
+    	IDENTIFIER '(' expression ')' {
+        	Types listType = findList(lists, $1);
+        	if (listType != MISMATCH && $3 != INT_TYPE) {
+            		appendError(GENERAL_SEMANTIC, "Integer Type Required for List Index");
+        	}
+        	$$ = listType;
+    		} |
     	IDENTIFIER { $$ = find(scalars, $1, "Scalar"); } ;
 
 arithmetic_operator: REMOP | EXOP
