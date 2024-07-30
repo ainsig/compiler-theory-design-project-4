@@ -594,10 +594,10 @@ static const yytype_uint8 yyrline[] =
        0,    65,    65,    70,    73,    77,    78,    79,    80,    83,
       83,    84,    87,    88,    91,    97,   102,   106,   110,   111,
      114,   115,   118,   121,   122,   126,   129,   130,   133,   134,
-     135,   137,   138,   141,   142,   145,   148,   148,   151,   151,
-     154,   154,   157,   158,   161,   162,   165,   166,   169,   173,
-     174,   175,   178,   178,   181,   182,   186,   188,   189,   192,
-     193,   197,   198,   199,   200,   201,   206,   207
+     135,   137,   141,   144,   145,   148,   151,   151,   154,   154,
+     157,   157,   160,   161,   164,   165,   168,   169,   172,   176,
+     177,   178,   181,   181,   184,   185,   189,   191,   192,   195,
+     196,   200,   201,   202,   203,   204,   209,   210
 };
 #endif
 
@@ -1632,138 +1632,147 @@ yyreduce:
 #line 1633 "parser.tab.c"
     break;
 
+  case 31: /* statement: IF condition THEN statement_ elsif_statements ELSE statement_ ENDIF  */
+#line 137 "parser.y"
+                                                                            {
+        	checkIfElseTypes((yyvsp[-4].type), (yyvsp[-1].type)); 
+        	(yyval.type) = (yyvsp[-4].type); 
+    	}
+#line 1642 "parser.tab.c"
+    break;
+
   case 42: /* cases: cases case  */
-#line 157 "parser.y"
+#line 160 "parser.y"
                    {(yyval.type) = checkCases((yyvsp[-1].type), (yyvsp[0].type));}
-#line 1639 "parser.tab.c"
+#line 1648 "parser.tab.c"
     break;
 
   case 43: /* cases: %empty  */
-#line 158 "parser.y"
+#line 161 "parser.y"
                {(yyval.type) = NONE;}
-#line 1645 "parser.tab.c"
+#line 1654 "parser.tab.c"
     break;
 
   case 44: /* case: CASE INT_LITERAL ARROW statement ';'  */
-#line 161 "parser.y"
+#line 164 "parser.y"
                                              {(yyval.type) = (yyvsp[-1].type);}
-#line 1651 "parser.tab.c"
+#line 1660 "parser.tab.c"
     break;
 
   case 48: /* relation: expression RELOP expression  */
-#line 169 "parser.y"
+#line 172 "parser.y"
                                     {
             checkRelationalTypes((yyvsp[-2].type), (yyvsp[0].type)); // Ensure valid relational comparison
             (yyval.type) = (yyvsp[-2].type); // Use the left operand type as the resulting type
         }
-#line 1660 "parser.tab.c"
+#line 1669 "parser.tab.c"
     break;
 
   case 50: /* relation: '(' condition ')'  */
-#line 174 "parser.y"
+#line 177 "parser.y"
                           { (yyval.type) = (yyvsp[-1].type); }
-#line 1666 "parser.tab.c"
+#line 1675 "parser.tab.c"
     break;
 
   case 51: /* relation: NOTOP condition  */
-#line 175 "parser.y"
+#line 178 "parser.y"
                         { (yyval.type) = (yyvsp[0].type); }
-#line 1672 "parser.tab.c"
+#line 1681 "parser.tab.c"
     break;
 
   case 54: /* expression: expression ADDOP term  */
-#line 181 "parser.y"
+#line 184 "parser.y"
                               { (yyval.type) = checkArithmetic((yyvsp[-2].type), (yyvsp[0].type)); }
-#line 1678 "parser.tab.c"
+#line 1687 "parser.tab.c"
     break;
 
   case 55: /* expression: expression REMOP term  */
-#line 182 "parser.y"
+#line 185 "parser.y"
                               {
             checkRemainderOperator((yyvsp[-2].type), (yyvsp[0].type)); // Ensure both operands are integers
             (yyval.type) = (yyvsp[-2].type); // Use the left operand type as the resulting type
         }
-#line 1687 "parser.tab.c"
+#line 1696 "parser.tab.c"
     break;
 
   case 56: /* expression: term  */
-#line 186 "parser.y"
+#line 189 "parser.y"
              { (yyval.type) = (yyvsp[0].type); }
-#line 1693 "parser.tab.c"
+#line 1702 "parser.tab.c"
     break;
 
   case 57: /* term: term MULOP primary  */
-#line 188 "parser.y"
+#line 191 "parser.y"
                            {(yyval.type) = checkArithmetic((yyvsp[-2].type), (yyvsp[0].type));}
-#line 1699 "parser.tab.c"
+#line 1708 "parser.tab.c"
     break;
 
   case 59: /* primary: '(' expression ')'  */
-#line 192 "parser.y"
+#line 195 "parser.y"
                            { (yyval.type) = (yyvsp[-1].type); }
-#line 1705 "parser.tab.c"
+#line 1714 "parser.tab.c"
     break;
 
   case 60: /* primary: NEGOP expression  */
-#line 193 "parser.y"
+#line 196 "parser.y"
                          {
             checkNegation((yyvsp[0].type)); // Ensure valid negation
             (yyval.type) = (yyvsp[0].type);
         }
-#line 1714 "parser.tab.c"
+#line 1723 "parser.tab.c"
     break;
 
   case 61: /* primary: INT_LITERAL  */
-#line 197 "parser.y"
+#line 200 "parser.y"
                     { (yyval.type) = INT_TYPE; }
-#line 1720 "parser.tab.c"
+#line 1729 "parser.tab.c"
     break;
 
   case 62: /* primary: HEX_LITERAL  */
-#line 198 "parser.y"
+#line 201 "parser.y"
                     { (yyval.type) = INT_TYPE; }
-#line 1726 "parser.tab.c"
+#line 1735 "parser.tab.c"
     break;
 
   case 63: /* primary: CHAR_LITERAL  */
-#line 199 "parser.y"
+#line 202 "parser.y"
                      { (yyval.type) = CHAR_TYPE; }
-#line 1732 "parser.tab.c"
+#line 1741 "parser.tab.c"
     break;
 
   case 64: /* primary: REAL_LITERAL  */
-#line 200 "parser.y"
+#line 203 "parser.y"
                      { (yyval.type) = REAL_TYPE; }
-#line 1738 "parser.tab.c"
+#line 1747 "parser.tab.c"
     break;
 
   case 65: /* primary: IDENTIFIER '(' expression ')'  */
-#line 201 "parser.y"
+#line 204 "parser.y"
                                       {
             Types listType = findList(lists, (yyvsp[-3].iden));
             checkListSubscript((yyvsp[-1].type)); // Ensure subscript is an integer
             (yyval.type) = listType;
         }
-#line 1748 "parser.tab.c"
+#line 1757 "parser.tab.c"
     break;
 
   case 66: /* primary: IDENTIFIER  */
-#line 206 "parser.y"
+#line 209 "parser.y"
                    { (yyval.type) = find(scalars, (yyvsp[0].iden), "Scalar"); }
-#line 1754 "parser.tab.c"
+#line 1763 "parser.tab.c"
     break;
 
   case 67: /* primary: expression EXOP expression  */
-#line 207 "parser.y"
+#line 210 "parser.y"
                                        {
             checkExponentiation((yyvsp[-2].type), (yyvsp[0].type)); // Ensure valid exponentiation
             (yyval.type) = (yyvsp[-2].type); // Use the base type as the resulting type
         }
-#line 1763 "parser.tab.c"
+#line 1772 "parser.tab.c"
     break;
 
 
-#line 1767 "parser.tab.c"
+#line 1776 "parser.tab.c"
 
       default: break;
     }
@@ -1987,7 +1996,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 214 "parser.y"
+#line 217 "parser.y"
 
 
 Types find(Symbols<Types>& table, CharPtr identifier, string tableName) {

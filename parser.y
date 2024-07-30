@@ -134,7 +134,10 @@ statement:
 	WHEN condition ',' expression ':' expression {$$ = checkWhen($4, $6);} |
 	SWITCH expression IS cases OTHERS ARROW statement ';' 
 	ENDSWITCH {$$ = checkSwitch($2, $4, $7);} | 
-	IF condition THEN statement_ elsif_statements ELSE statement_ ENDIF |
+	IF condition THEN statement_ elsif_statements ELSE statement_ ENDIF {
+        	checkIfElseTypes($4, $7); 
+        	$$ = $4; 
+    	} |
 	FOLD direction operator list_choice ENDFOLD ;
 	
 elsif_statements: 
