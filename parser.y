@@ -29,7 +29,7 @@ void checkRemainderOperator(Types left, Types right);
 void checkIfElseTypes(Types ifType, Types elsifType, Types elseType);
 void checkFoldListType(Types listType);
 void checkFunctionReturn(Types returnType, Types bodyType);
-
+void checkDuplicateIdentifier(Symbols<Types>& table, CharPtr identifier, string tableName);
 
 Symbols<Types> scalars;
 Symbols<Types> lists;

@@ -12,6 +12,7 @@ typedef char* CharPtr;
 enum Types {MISMATCH, INT_TYPE, CHAR_TYPE, REAL_TYPE, HEX_TYPE, LIST_TYPE, NONE};
 
 
+
 void checkAssignment(Types lValue, Types rValue, string message);
 Types checkWhen(Types true_, Types false_);
 Types checkSwitch(Types case_, Types when, Types other);
@@ -26,5 +27,6 @@ void checkRemainderOperator(Types left, Types right);
 void checkIfElseTypes(Types ifType, Types elseType);
 void checkFoldListType(Types listType);
 void checkFunctionReturn(Types returnType, Types bodyType);
+
 
 
