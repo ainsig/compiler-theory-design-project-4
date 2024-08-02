@@ -1,0 +1,8 @@
+-- Narrowing Variable Initialization
+
+function main returns integer;
+    b: integer is 10 / 4.0;
+begin
+    b + 2;
+end;
+

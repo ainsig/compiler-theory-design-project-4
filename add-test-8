@@ -1,0 +1,12 @@
+-- Narrowing Function Return with Different Branch Condition
+
+function main returns integer;
+    b: integer is 6 * 2;
+begin
+    if 8 >= 10 then
+        b + 3.0;
+    else
+        b * 4.5;
+    endif;
+end;
+

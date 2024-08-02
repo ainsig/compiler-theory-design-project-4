@@ -1,0 +1,12 @@
+-- Invalid Comparison of Character and Numeric Types
+
+function main returns integer;
+begin
+    if 'a' > 2 then
+        10;
+    elsif 3.5 <= 'z' then
+        20;
+    else
+        30;
+    endif;
+end;

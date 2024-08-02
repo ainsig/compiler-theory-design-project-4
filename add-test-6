@@ -1,0 +1,13 @@
+-- If Elsif Else Type Mismatch
+
+function main returns integer;
+begin
+    if 5 > 3 then
+        10;
+    elsif 2 < 1 then
+        20;
+    else 
+        2.5;
+    endif;
+end;
+

@@ -1,0 +1,8 @@
+// Using Character Literal with Multiplication Operator
+//     and Addition Operator
+
+function main returns integer;
+    c: character is 'c' * 2;
+begin
+    5 + 'P';
+end;

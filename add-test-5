@@ -1,0 +1,8 @@
+// Using Character Literal with Remainder Operator
+//     and Division Operator
+
+function main returns integer;
+begin
+    4 % 'A';
+end;
+
